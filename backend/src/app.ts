@@ -3,6 +3,7 @@ import { InventoryController } from './modules/inventory/inventory.controller.js
 import { OrdersController } from './modules/orders/orders.controller.js';
 import { UsersController } from './modules/users/users.controller.js';
 import cors from 'cors';
+import multer from 'multer';
 import { requireAuth, requireAdmin } from './modules/users/auth.middleware.js';
 const usersController = new UsersController();
 const app = express();
@@ -14,9 +15,9 @@ app.use(cors({
 app.use(express.json());
 const inventoryController = new InventoryController();
 const ordersController = new OrdersController();
-app.post('/api/v1/products', inventoryController.createProduct);
+const upload = multer({ storage: multer.memoryStorage() });
 app.get('/api/v1/products', inventoryController.getProducts);
-app.post('/api/v1/products', requireAuth, requireAdmin, inventoryController.createProduct);
+app.post('/api/v1/products', requireAuth, requireAdmin, upload.single('image'), inventoryController.createProduct);
 app.post('/api/v1/checkout', requireAuth, ordersController.checkout);
 app.get('/api/v1/orders/me', requireAuth, ordersController.getMyOrders);
 app.post('/api/v1/users/register', usersController.register);

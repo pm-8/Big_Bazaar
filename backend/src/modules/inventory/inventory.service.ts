@@ -1,4 +1,3 @@
-//inventory.service.ts
 import { InventoryRepository, type CreateProductInput } from './inventory.model.js';
 
 export class InventoryService {
@@ -17,7 +16,12 @@ export class InventoryService {
 
     return await this.repository.createProduct(input);
   }
-  async getAllProducts(){
+
+  async getAllProducts() {
     return await this.repository.getProducts();
+  }
+
+  async getProductById(id: number) {
+    return await this.repository.getProductById(id);
   }
 }
