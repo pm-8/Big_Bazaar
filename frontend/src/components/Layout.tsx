@@ -39,10 +39,10 @@ export default function Layout() {
       <header className="px-8 py-4 bg-[#4C3D19] flex justify-between items-center shadow-lg">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-[#889063] flex items-center justify-center shadow">
-            <span className="text-[#E5D7C4] text-sm font-bold">V</span>
+            <span className="text-[#E5D7C4] text-sm font-bold">BB</span>
           </div>
           <h1 className="text-[#E5D7C4] text-xl tracking-[0.18em] uppercase font-semibold">
-            Verdure
+            Big Bazaar
           </h1>
         </div>
         <div className="flex items-center gap-5">
@@ -69,13 +69,18 @@ export default function Layout() {
             {navLink('/my-orders', 'My Orders', '📦')}
           </ul>
 
-          <div className="my-5 border-t border-[#CFBB99]/70" />
+          {/* SECURITY UPDATE: Only show Admin section if the user's role is ADMIN */}
+          {user?.role === 'ADMIN' && (
+            <>
+              <div className="my-5 border-t border-[#CFBB99]/70" />
 
-          <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#889063] px-4 mb-3">Admin</p>
-          <ul className="flex flex-col gap-1">
-            {navLink('/', 'Dashboard', '📊')}
-            {navLink('/products', 'Inventory', '⚙️')}
-          </ul>
+              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#889063] px-4 mb-3">Admin</p>
+              <ul className="flex flex-col gap-1">
+                {navLink('/', 'Dashboard', '📊')}
+                {navLink('/products', 'Inventory', '⚙️')}
+              </ul>
+            </>
+          )}
         </nav>
 
         {/* Main */}

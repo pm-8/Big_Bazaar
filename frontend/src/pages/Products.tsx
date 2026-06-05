@@ -1,4 +1,3 @@
-//products.tsx
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 
@@ -8,6 +7,7 @@ interface Product {
   description: string;
   price: number;
   stock: number;
+  image_url?: string; 
 }
 
 export default function Products() {
@@ -15,10 +15,10 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  // New state for our Add Product form
   const [showForm, setShowForm] = useState(false);
   const [formError, setFormError] = useState('');
   const [formData, setFormData] = useState({ name: '', description: '', price: '', stock: '' });
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const fetchProducts = async () => {
     try {
@@ -37,33 +37,38 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  // Handle Input Changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle Form Submission
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
 
     try {
-      // Ensure numbers are properly formatted before sending to the backend
-      const payload = {
-        ...formData,
-        price: parseFloat(formData.price),
-        stock: parseInt(formData.stock, 10)
-      };
-
-      await api.post('/products', payload);
+      // Using FormData to package the text and the physical image file
+      const payload = new FormData();
+      payload.append('name', formData.name);
+      payload.append('description', formData.description);
+      payload.append('price', formData.price);
+      payload.append('stock', formData.stock);
       
-      // Reset the form, close it, and refresh the table!
+      if (imageFile) {
+        payload.append('image', imageFile); 
+      }
+
+      // Send to Express with the multipart header
+      await api.post('/products', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      // Reset form and UI
       setFormData({ name: '', description: '', price: '', stock: '' });
+      setImageFile(null); 
       setShowForm(false);
       fetchProducts(); 
     } catch (err: any) {
-      console.error('Add Product Error:', err);
-      setFormError(err.response?.data?.error || 'Failed to add product. Are you logged in as an Admin?');
+      setFormError(err.response?.data?.error || 'Failed to add product.');
     }
   };
 
@@ -99,7 +104,7 @@ export default function Products() {
             
             <div style={{ display: 'flex', gap: '15px' }}>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Price ($)</label>
+                <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Price (₹)</label>
                 <input type="number" name="price" step="0.01" min="0" required value={formData.price} onChange={handleInputChange} style={{ padding: '10px' }} />
               </div>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -108,7 +113,19 @@ export default function Products() {
               </div>
             </div>
 
-            <button type="submit" style={{ padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+            {/* --- THE NEW IMAGE UPLOAD INPUT --- */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Product Image (Optional)</label>
+              <input 
+                type="file" 
+                accept="image/*" 
+                capture="environment"
+                onChange={(e) => setImageFile(e.target.files ? e.target.files[0] : null)}
+                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f8f9fa' }} 
+              />
+            </div>
+
+            <button type="submit" style={{ padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', marginTop: '5px' }}>
               Save Product
             </button>
           </form>
@@ -127,9 +144,9 @@ export default function Products() {
         <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
           <thead>
             <tr style={{ backgroundColor: '#eaedf2', textAlign: 'left' }}>
+              <th style={{ padding: '12px 15px' }}>Image</th>
               <th style={{ padding: '12px 15px' }}>ID</th>
               <th style={{ padding: '12px 15px' }}>Name</th>
-              <th style={{ padding: '12px 15px' }}>Description</th>
               <th style={{ padding: '12px 15px' }}>Price</th>
               <th style={{ padding: '12px 15px' }}>Stock Status</th>
             </tr>
@@ -137,10 +154,30 @@ export default function Products() {
           <tbody>
             {products.map((product) => (
               <tr key={product.id} style={{ borderBottom: '1px solid #eee' }}>
+                
+                {/* --- NEW THUMBNAIL COLUMN --- */}
+                <td style={{ padding: '12px 15px' }}>
+                  {product.image_url ? (
+                    <img 
+                      src={product.image_url} 
+                      alt={product.name} 
+                      style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }} 
+                    />
+                  ) : (
+                    <div style={{ width: '40px', height: '40px', backgroundColor: '#eee', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#999' }}>
+                      N/A
+                    </div>
+                  )}
+                </td>
+
                 <td style={{ padding: '12px 15px', fontWeight: 'bold' }}>#{product.id}</td>
-                <td style={{ padding: '12px 15px' }}>{product.name}</td>
-                <td style={{ padding: '12px 15px', color: '#666' }}>{product.description || 'No description provided'}</td>
-                <td style={{ padding: '12px 15px', fontWeight: '500' }}>${Number(product.price).toFixed(2)}</td>
+                <td style={{ padding: '12px 15px' }}>
+                  <div>{product.name}</div>
+                  <div style={{ fontSize: '12px', color: '#666' }}>
+                    {product.description ? (product.description.length > 40 ? product.description.substring(0, 40) + '...' : product.description) : 'No description'}
+                  </div>
+                </td>
+                <td style={{ padding: '12px 15px', fontWeight: '500' }}>₹{Number(product.price).toFixed(2)}</td>
                 <td style={{ padding: '12px 15px' }}>
                   <span style={{
                     padding: '4px 8px',
@@ -150,7 +187,7 @@ export default function Products() {
                     backgroundColor: product.stock > 0 ? '#d4edda' : '#f8d7da',
                     color: product.stock > 0 ? '#155724' : '#721c24'
                   }}>
-                    {product.stock > 0 ? `${product.stock} Units In Stock` : 'Out of Stock'}
+                    {product.stock > 0 ? `${product.stock} In Stock` : 'Out of Stock'}
                   </span>
                 </td>
               </tr>

@@ -27,8 +27,16 @@ export default function Login() {
         : formData;
       const res = await api.post(endpoint, payload);
       const { user, token } = res.data.data;
+      
       setAuth(user, token);
-      navigate('/');
+      
+      // SECURITY UPDATE: Route the user based on their specific role!
+      if (user.role === 'ADMIN') {
+        navigate('/'); // Send admins to the dashboard
+      } else {
+        navigate('/store'); // Send customers straight to the shop
+      }
+
     } catch (err: any) {
       setError(err.response?.data?.error || 'Authentication failed. Is the backend running?');
     } finally {

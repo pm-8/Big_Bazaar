@@ -8,6 +8,7 @@ import MyOrders from './pages/MyOrders';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
+import ProductDetail from './pages/ProductDetail';
 function App() {
   return (
     <Routes>
@@ -27,7 +28,7 @@ function App() {
           <Route path="/store" element={<Storefront />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/my-orders" element={<MyOrders />} />
-          
+          <Route path="/product/:id" element={<ProductDetail />} />
         </Route>
       </Route>
     </Routes>

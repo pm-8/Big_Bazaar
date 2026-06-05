@@ -1,5 +1,5 @@
-//storefront.tsx
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom'; // <-- Added Link for navigation
 import { api } from '../lib/api';
 import { useCartStore } from '../store/useCartStore';
 
@@ -9,6 +9,7 @@ interface Product {
   description: string;
   price: number;
   stock: number;
+  image_url?: string; // <-- Added image_url
 }
 
 export default function Storefront() {
@@ -61,15 +62,28 @@ export default function Storefront() {
                 hover:-translate-y-1"
               style={{ animationDelay: `${i * 60}ms` }}
             >
+              
+              {/* --- NEW IMAGE DISPLAY WRAPPED IN A LINK --- */}
+              <Link to={`/product/${product.id}`} className="block w-full h-48 relative bg-[#E5D7C4]/30 overflow-hidden cursor-pointer">
+                <img 
+                  src={product.image_url || 'https://placehold.co/600x400/E5D7C4/889063?text=Verdure'} 
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              </Link>
+
               <div className="h-1.5 w-full bg-gradient-to-r from-[#354024] via-[#889063] to-[#CFBB99]" />
 
               <div className="p-6 flex flex-col flex-1">
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-[#4C3D19] mb-2 leading-snug" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    {product.name}
+                    {/* Make the title a clickable link too */}
+                    <Link to={`/product/${product.id}`} className="hover:text-[#889063] transition-colors">
+                      {product.name}
+                    </Link>
                   </h3>
                   <p className="text-sm text-[#889063] font-medium leading-relaxed mb-5">
-                    {product.description}
+                    {product.description.length > 60 ? product.description.substring(0, 60) + '...' : product.description}
                   </p>
                 </div>
 
@@ -77,7 +91,7 @@ export default function Storefront() {
                   <div>
                     <p className="text-[10px] font-bold tracking-widest uppercase text-[#889063]">Price</p>
                     <span className="text-2xl font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                      ${Number(product.price).toFixed(2)}
+                      ₹{Number(product.price).toFixed(2)}
                     </span>
                   </div>
 

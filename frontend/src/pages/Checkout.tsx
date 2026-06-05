@@ -72,12 +72,12 @@ export default function Checkout() {
                     <div className="flex-1">
                       <p className="text-sm font-bold text-[#4C3D19]">{item.name}</p>
                       <p className="text-xs font-medium text-[#889063] mt-0.5">
-                        {item.quantity} × ${Number(item.price).toFixed(2)}
+                        {item.quantity} × ₹{Number(item.price).toFixed(2)}
                       </p>
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="text-base font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ₹{(item.price * item.quantity).toFixed(2)}
                       </span>
                       <button
                         onClick={() => removeFromCart(item.productId)}
@@ -95,7 +95,7 @@ export default function Checkout() {
                   <div>
                     <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#889063]">Order Total</p>
                     <p className="text-3xl font-bold text-[#354024] mt-0.5" style={{ fontFamily: "'Playfair Display', serif" }}>
-                      ${cartTotal.toFixed(2)}
+                      ₹{cartTotal.toFixed(2)}
                     </p>
                   </div>
                   <div className="text-right">
@@ -156,7 +156,7 @@ export default function Checkout() {
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-sm font-semibold text-[#889063]">Total due</span>
                   <span className="text-xl font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    ${cartTotal.toFixed(2)}
+                    ₹{cartTotal.toFixed(2)}
                   </span>
                 </div>
                 <button

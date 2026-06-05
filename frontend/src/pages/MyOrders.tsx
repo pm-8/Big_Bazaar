@@ -86,7 +86,7 @@ export default function MyOrders() {
                     <div>
                       <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#889063] mb-1">Total</p>
                       <p className="text-xl font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                        ${Number(order.total_amount).toFixed(2)}
+                        ₹{Number(order.total_amount).toFixed(2)}
                       </p>
                     </div>
                     <div>
