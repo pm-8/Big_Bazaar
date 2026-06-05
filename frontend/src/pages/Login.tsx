@@ -61,10 +61,10 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#354024] mb-4 shadow-xl">
-            <span className="text-[#E5D7C4] text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>V</span>
+            <span className="text-[#E5D7C4] text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>BB</span>
           </div>
           <h1 className="text-3xl tracking-[0.2em] uppercase text-[#354024] font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-            Verdure
+            Big Bazaar
           </h1>
           <p className="text-[#889063] text-xs tracking-widest mt-1 uppercase font-medium">Natural Living Store</p>
         </div>
