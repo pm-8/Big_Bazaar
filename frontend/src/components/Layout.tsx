@@ -64,7 +64,7 @@ export default function Layout() {
         <nav className="w-60 bg-[#E5D7C4] border-r border-[#CFBB99]/70 py-8 px-4 flex flex-col gap-1 shrink-0 shadow-sm">
           <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#889063] px-4 mb-3">Shop</p>
           <ul className="flex flex-col gap-1">
-            {navLink('/store', 'Storefront', '🛍️')}
+            {navLink('/', 'Storefront', '🛍️')}
             {navLink('/checkout', `Cart (${items.length})`, '🛒')}
             {navLink('/my-orders', 'My Orders', '📦')}
           </ul>
@@ -76,7 +76,7 @@ export default function Layout() {
 
               <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#889063] px-4 mb-3">Admin</p>
               <ul className="flex flex-col gap-1">
-                {navLink('/', 'Dashboard', '📊')}
+                {navLink('/dashboard', 'Dashboard', '📊')}
                 {navLink('/products', 'Inventory', '⚙️')}
               </ul>
             </>
