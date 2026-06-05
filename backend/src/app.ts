@@ -17,6 +17,7 @@ const inventoryController = new InventoryController();
 const ordersController = new OrdersController();
 const upload = multer({ storage: multer.memoryStorage() });
 app.get('/api/v1/products', inventoryController.getProducts);
+app.get('/api/v1/products/:id', inventoryController.getProductById);
 app.post('/api/v1/products', requireAuth, requireAdmin, upload.single('image'), inventoryController.createProduct);
 app.post('/api/v1/checkout', requireAuth, ordersController.checkout);
 app.get('/api/v1/orders/me', requireAuth, ordersController.getMyOrders);
