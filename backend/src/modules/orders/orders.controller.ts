@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express';
 import { pool } from '../../config/db.js';
-
+import { OrdersService } from './orders.service.js';
 export class OrdersController {
+  private service = new OrdersService();
   
   // POST: Process a Checkout
   checkout = async (req: any, res: Response): Promise<void> => {
@@ -76,6 +77,22 @@ export class OrdersController {
       res.status(200).json({ success: true, message: 'Order status updated successfully' });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
+    }
+  };
+  getOrderById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const order = await this.service.getOrderById(parseInt((id as string), 10));
+      
+      if (!order) {
+        res.status(404).json({ success: false, error: 'Order not found' });
+        return;
+      }
+
+      res.status(200).json({ success: true, data: order });
+    } catch (error: any) {
+      console.error('Fetch Order Error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch order details' });
     }
   };
 }

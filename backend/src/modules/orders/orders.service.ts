@@ -31,4 +31,7 @@ export class OrdersService {
       validatedItems
     );
   }
+  async getOrderById(orderId: number) {
+    return await this.ordersRepo.getOrderById(orderId);
+  }
 }
