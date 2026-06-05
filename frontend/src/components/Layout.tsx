@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, Link } from 'react-router-dom';
+import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
 
@@ -6,69 +6,80 @@ export default function Layout() {
   const { user, clearAuth } = useAuthStore();
   const { items } = useCartStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
-    clearAuth(); // Wipes the global auth state
-    navigate('/login'); // Sends you back to login
+    clearAuth();
+    navigate('/login');
+  };
+
+  const navLink = (to: string, label: string, icon: string) => {
+    const isActive = location.pathname === to;
+    return (
+      <li>
+        <Link
+          to={to}
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg text-[13px] font-semibold tracking-wide transition-all duration-200
+            ${isActive
+              ? 'bg-[#354024] text-[#E5D7C4] shadow-sm'
+              : 'text-[#4C3D19] hover:bg-[#CFBB99]/50 hover:text-[#354024]'
+            }`}
+        >
+          <span className="text-base">{icon}</span>
+          {label}
+        </Link>
+      </li>
+    );
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      
-      {/* Top Header Bar */}
-      <header style={{ padding: '15px 30px', backgroundColor: '#1a1a1a', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ margin: 0 }}>My E-Commerce Store</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <span>Logged in as: <strong>{user?.name}</strong></span>
-          <button onClick={handleLogout} style={{ padding: '6px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+    <div className="flex flex-col min-h-screen bg-[#F0EAE0]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+
+      {/* Header */}
+      <header className="px-8 py-4 bg-[#4C3D19] flex justify-between items-center shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-[#889063] flex items-center justify-center shadow">
+            <span className="text-[#E5D7C4] text-sm font-bold">V</span>
+          </div>
+          <h1 className="text-[#E5D7C4] text-xl tracking-[0.18em] uppercase font-semibold">
+            Verdure
+          </h1>
+        </div>
+        <div className="flex items-center gap-5">
+          <span className="text-[#CFBB99] text-sm font-medium">
+            Hello, <span className="text-[#E5D7C4] font-semibold">{user?.name}</span>
+          </span>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 border border-[#889063]/70 text-[#CFBB99] text-xs font-semibold tracking-widest uppercase hover:bg-[#889063]/20 transition-all duration-200 rounded-lg"
+          >
             Logout
           </button>
         </div>
       </header>
 
-      {/* Content Area Wrapper */}
-      <div style={{ display: 'flex', flex: 1 }}>
-        
-        {/* Left Hand Navigation Sidebar */}
-        <nav style={{ width: '220px', backgroundColor: '#fff', borderRight: '1px solid #ddd', padding: '20px' }}>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            
-            {/* The Customer Links */}
-            <li>
-              <Link to="/store" style={{ display: 'block', padding: '10px', color: '#333', textDecoration: 'none', borderRadius: '4px', fontWeight: '500', backgroundColor: '#f8f9fa' }}>
-                🛍️ Storefront
-              </Link>
-            </li>
-            <li>
-              <Link to="/checkout" style={{ display: 'block', padding: '10px', color: '#333', textDecoration: 'none', borderRadius: '4px', fontWeight: '500' }}>
-                🛒 Cart ({items.length})
-              </Link>
-            </li>
-            <li>
-              <Link to="/my-orders" style={{ display: 'block', padding: '10px', color: '#333', textDecoration: 'none', borderRadius: '4px', fontWeight: '500' }}>
-                📦 My Orders
-              </Link>
-            </li>
+      <div className="flex flex-1">
 
-            <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '10px 0' }} />
+        {/* Sidebar */}
+        <nav className="w-60 bg-[#E5D7C4] border-r border-[#CFBB99]/70 py-8 px-4 flex flex-col gap-1 shrink-0 shadow-sm">
+          <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#889063] px-4 mb-3">Shop</p>
+          <ul className="flex flex-col gap-1">
+            {navLink('/store', 'Storefront', '🛍️')}
+            {navLink('/checkout', `Cart (${items.length})`, '🛒')}
+            {navLink('/my-orders', 'My Orders', '📦')}
+          </ul>
 
-            {/* The Admin Links */}
-            <li style={{ fontSize: '12px', color: '#999', textTransform: 'uppercase', paddingLeft: '10px' }}>Admin Tools</li>
-            <li>
-              <Link to="/" style={{ display: 'block', padding: '10px', color: '#333', textDecoration: 'none', borderRadius: '4px', fontWeight: '500' }}>
-                📊 Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link to="/products" style={{ display: 'block', padding: '10px', color: '#333', textDecoration: 'none', borderRadius: '4px', fontWeight: '500' }}>
-                ⚙️ Manage Inventory
-              </Link>
-            </li>
+          <div className="my-5 border-t border-[#CFBB99]/70" />
+
+          <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#889063] px-4 mb-3">Admin</p>
+          <ul className="flex flex-col gap-1">
+            {navLink('/', 'Dashboard', '📊')}
+            {navLink('/products', 'Inventory', '⚙️')}
           </ul>
         </nav>
 
-        {/* Main Workspace (where the pages actually render) */}
-        <main style={{ padding: '30px', flex: 1, backgroundColor: '#f4f4f9' }}>
+        {/* Main */}
+        <main className="flex-1 p-8 bg-[#F0EAE0]/80 min-h-full">
           <Outlet />
         </main>
 

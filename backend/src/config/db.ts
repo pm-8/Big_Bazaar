@@ -3,11 +3,8 @@ import 'dotenv/config'; // Ensure env variables are loaded
 
 // 1. Configure the PostgreSQL Connection Pool
 export const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'ecommerce_core',
-  password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT || '5432', 10),
+  connectionString: process.env.DATABASE_URL,
+  ssl: true,
 });
 
 // 2. Database Initialization Script

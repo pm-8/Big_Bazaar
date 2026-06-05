@@ -1,3 +1,4 @@
+//inventory.controller.ts
 import type { Request, Response } from 'express';
 import { InventoryService } from './inventory.service.js';
 

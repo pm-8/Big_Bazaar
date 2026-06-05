@@ -1,3 +1,4 @@
+//inventory.model.ts
 import { pool } from '../../config/db.js';
 
 export interface CreateProductInput {

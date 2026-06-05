@@ -1,3 +1,4 @@
+//inventory.service.ts
 import { InventoryRepository, type CreateProductInput } from './inventory.model.js';
 
 export class InventoryService {

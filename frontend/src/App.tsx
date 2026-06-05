@@ -7,7 +7,7 @@ import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-
+import './App.css';
 function App() {
   return (
     <Routes>

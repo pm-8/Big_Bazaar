@@ -7,96 +7,175 @@ import { useNavigate } from 'react-router-dom';
 export default function Checkout() {
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
-  
-  const { items, getCartTotal, removeFromCart, clearCart } = useCartStore(); 
-  
+  const { items, getCartTotal, removeFromCart, clearCart } = useCartStore();
   const [formData, setFormData] = useState({ shippingAddress: '', phone: user?.phone || '' });
   const [error, setError] = useState('');
-
+  const [loading, setLoading] = useState(false);
   const cartTotal = getCartTotal();
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) return setError('Your cart is empty!');
-
+    setLoading(true);
     try {
-      const payload = {
+      await api.post('/checkout', {
         shippingAddress: formData.shippingAddress,
         phone: formData.phone,
-        totalAmount: cartTotal, 
-        items: items 
-      };
-
-      await api.post('/checkout', payload);
-      
-      clearCart(); // Wipe the cart
-      navigate('/my-orders'); // Teleport the user to their receipts!
-      
+        totalAmount: cartTotal,
+        items,
+      });
+      clearCart();
+      navigate('/my-orders');
     } catch (err: any) {
-      console.error('Full Checkout Error:', err);
-      const backendError = err.response?.data?.error;
-      setError(backendError || err.message || 'Checkout failed.');
+      setError(err.response?.data?.error || err.message || 'Checkout failed.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const inputClass = `w-full px-4 py-3 bg-white/80 border border-[#CFBB99] rounded-xl text-[#4C3D19]
+    placeholder:text-[#889063]/80 text-sm font-medium focus:outline-none focus:border-[#354024]
+    focus:ring-2 focus:ring-[#354024]/20 transition-all duration-200 shadow-sm resize-none`;
+
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', gap: '30px', alignItems: 'flex-start' }}>
-      
-      {/* Left Column: The Cart Details */}
-      <div style={{ flex: 1, backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
-        <h2>Review Your Cart</h2>
-        
-        {items.length === 0 ? (
-          <p>Your cart is currently empty.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {items.map((item) => (
-              <div key={item.productId} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-                <div>
-                  <strong>{item.name}</strong> <br/>
-                  <small>Qty: {item.quantity} x ${Number(item.price).toFixed(2)}</small>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  <strong>${(item.price * item.quantity).toFixed(2)}</strong>
-                  <button onClick={() => removeFromCart(item.productId)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer', fontSize: '18px' }}>🗑️</button>
-                </div>
-              </div>
-            ))}
-            
-            <div style={{ textAlign: 'right', fontSize: '20px', marginTop: '10px' }}>
-              <strong>Total: ${cartTotal.toFixed(2)}</strong>
-            </div>
-          </div>
-        )}
+    <div style={{ fontFamily: "'Poppins', sans-serif" }}>
+      <div className="mb-8">
+        <p className="text-xs font-bold tracking-[0.25em] uppercase text-[#889063] mb-1">Review & Pay</p>
+        <h1 className="text-4xl font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
+          Checkout
+        </h1>
+        <div className="mt-3 w-14 h-1 bg-gradient-to-r from-[#354024] to-[#889063] rounded-full" />
       </div>
 
-      {/* Right Column: The Checkout Form */}
-      <div style={{ width: '350px', backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
-        <h2>Secure Checkout</h2>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        
-        <form onSubmit={handleCheckout} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <textarea 
-            placeholder="Shipping Address (Street, City, Zip)" 
-            required rows={3}
-            value={formData.shippingAddress} 
-            onChange={(e) => setFormData({...formData, shippingAddress: e.target.value})}
-            style={{ padding: '10px' }}
-          />
-          <input 
-            type="tel" placeholder="Phone Number" required 
-            value={formData.phone} 
-            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            style={{ padding: '10px' }}
-          />
-          <button 
-            type="submit" 
-            disabled={items.length === 0}
-            style={{ padding: '12px', backgroundColor: items.length === 0 ? '#ccc' : '#28a745', color: 'white', border: 'none', borderRadius: '4px', fontSize: '16px', cursor: items.length === 0 ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
-          >
-            Complete Purchase
-          </button>
-        </form>
+      <div className="flex gap-7 items-start max-w-5xl">
+
+        {/* Left — Cart Review */}
+        <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-2xl border border-[#CFBB99]/60 shadow-sm overflow-hidden">
+          <div className="h-1.5 w-full bg-gradient-to-r from-[#354024] via-[#889063] to-[#CFBB99]" />
+          <div className="p-7">
+            <h2 className="text-xl font-bold text-[#4C3D19] mb-5" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Your Cart
+            </h2>
+
+            {items.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-3 text-[#889063]">
+                <span className="text-4xl">🛒</span>
+                <p className="text-sm font-semibold tracking-wide">Your cart is empty</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-0">
+                {items.map((item, i) => (
+                  <div
+                    key={item.productId}
+                    className={`flex justify-between items-center py-4 ${i < items.length - 1 ? 'border-b border-[#CFBB99]/50' : ''}`}
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-[#4C3D19]">{item.name}</p>
+                      <p className="text-xs font-medium text-[#889063] mt-0.5">
+                        {item.quantity} × ${Number(item.price).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-base font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </span>
+                      <button
+                        onClick={() => removeFromCart(item.productId)}
+                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 text-[#889063] hover:text-red-500 transition-all duration-200"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="mt-5 pt-5 border-t-2 border-[#CFBB99]/70 flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#889063]">Order Total</p>
+                    <p className="text-3xl font-bold text-[#354024] mt-0.5" style={{ fontFamily: "'Playfair Display', serif" }}>
+                      ${cartTotal.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-medium text-[#889063]">{items.length} item{items.length !== 1 ? 's' : ''}</p>
+                    <p className="text-xs font-medium text-[#889063]">Free shipping</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right — Checkout Form */}
+        <div className="w-[340px] shrink-0 bg-white/80 backdrop-blur-sm rounded-2xl border border-[#CFBB99]/60 shadow-sm overflow-hidden">
+          <div className="h-1.5 w-full bg-gradient-to-r from-[#354024] via-[#889063] to-[#CFBB99]" />
+          <div className="p-7">
+            <h2 className="text-xl font-bold text-[#4C3D19] mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Delivery Details
+            </h2>
+            <p className="text-xs font-medium text-[#889063] mb-6 tracking-wide">We'll ship to the address below</p>
+
+            {error && (
+              <div className="mb-5 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-medium">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleCheckout} className="flex flex-col gap-4">
+              <div>
+                <label className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#889063] block mb-1.5">
+                  Shipping Address
+                </label>
+                <textarea
+                  placeholder="Street, City, Zip Code"
+                  required
+                  rows={3}
+                  value={formData.shippingAddress}
+                  onChange={(e) => setFormData({ ...formData, shippingAddress: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#889063] block mb-1.5">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  placeholder="+1 (555) 000-0000"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+
+              <div className="mt-2 pt-5 border-t border-[#CFBB99]/50">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm font-semibold text-[#889063]">Total due</span>
+                  <span className="text-xl font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    ${cartTotal.toFixed(2)}
+                  </span>
+                </div>
+                <button
+                  type="submit"
+                  disabled={items.length === 0 || loading}
+                  className="w-full py-4 bg-[#354024] text-[#E5D7C4] text-sm font-bold tracking-[0.12em] uppercase
+                    rounded-xl hover:bg-[#4C3D19] active:scale-[0.98] transition-all duration-200
+                    disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                >
+                  {loading ? 'Processing…' : '✦ Complete Purchase'}
+                </button>
+                <p className="text-center text-xs text-[#889063] font-medium mt-3">
+                  🔒 Secured & encrypted checkout
+                </p>
+              </div>
+            </form>
+          </div>
+        </div>
+
       </div>
     </div>
   );

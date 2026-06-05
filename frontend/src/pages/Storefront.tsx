@@ -1,3 +1,4 @@
+//storefront.tsx
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { useCartStore } from '../store/useCartStore';
@@ -13,8 +14,6 @@ interface Product {
 export default function Storefront() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Pull our new decrement hook from the store
   const { items, addToCart, decrementQuantity } = useCartStore();
 
   useEffect(() => {
@@ -31,65 +30,92 @@ export default function Storefront() {
     fetchProducts();
   }, []);
 
-  if (loading) return <p style={{ padding: '20px' }}>Loading store...</p>;
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 border-[3px] border-[#354024] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[#889063] text-xs font-semibold tracking-[0.25em] uppercase">Loading Products…</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div>
-      <h1 style={{ marginTop: 0 }}>Latest Products</h1>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px', marginTop: '20px' }}>
-        {products.map((product) => {
-          
+    <div style={{ fontFamily: "'Poppins', sans-serif" }}>
+      <div className="mb-8">
+        <p className="text-xs font-bold tracking-[0.25em] uppercase text-[#889063] mb-1">Collection</p>
+        <h1 className="text-4xl font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
+          Latest Products
+        </h1>
+        <div className="mt-3 w-14 h-1 bg-gradient-to-r from-[#354024] to-[#889063] rounded-full" />
+      </div>
+
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-6">
+        {products.map((product, i) => {
           const cartItem = items.find((item) => item.productId === product.id);
 
           return (
-            <div key={product.id} style={{ padding: '20px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column' }}>
-              <h3 style={{ margin: '0 0 10px 0' }}>{product.name}</h3>
-              <p style={{ color: '#666', flexGrow: 1, margin: '0 0 15px 0' }}>{product.description}</p>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '18px', fontWeight: 'bold' }}>${Number(product.price).toFixed(2)}</span>
-                
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  
-                  {/* If out of stock, just show a disabled button */}
+            <div
+              key={product.id}
+              className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-[#CFBB99]/60
+                shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden
+                hover:-translate-y-1"
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
+              <div className="h-1.5 w-full bg-gradient-to-r from-[#354024] via-[#889063] to-[#CFBB99]" />
+
+              <div className="p-6 flex flex-col flex-1">
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-[#4C3D19] mb-2 leading-snug" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    {product.name}
+                  </h3>
+                  <p className="text-sm text-[#889063] font-medium leading-relaxed mb-5">
+                    {product.description}
+                  </p>
+                </div>
+
+                <div className="flex justify-between items-center pt-4 border-t border-[#CFBB99]/50">
+                  <div>
+                    <p className="text-[10px] font-bold tracking-widest uppercase text-[#889063]">Price</p>
+                    <span className="text-2xl font-bold text-[#354024]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                      ${Number(product.price).toFixed(2)}
+                    </span>
+                  </div>
+
                   {product.stock === 0 ? (
-                     <button disabled style={{ padding: '8px 15px', backgroundColor: '#ccc', color: 'white', border: 'none', borderRadius: '4px', cursor: 'not-allowed', fontWeight: 'bold' }}>
-                       Out of Stock
-                     </button>
-                  ) : 
-                  
-                  /* If it's IN the cart, show the Plus/Minus Controller */
-                  cartItem ? (
-                    <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f0f0f0', borderRadius: '6px', overflow: 'hidden', border: '1px solid #ddd' }}>
-                      <button 
+                    <span className="px-4 py-2 text-xs font-semibold tracking-widest uppercase text-[#889063]
+                      border border-[#CFBB99] rounded-full cursor-not-allowed bg-[#F0EAE0]">
+                      Sold Out
+                    </span>
+                  ) : cartItem ? (
+                    <div className="flex items-center gap-1 bg-[#E5D7C4] rounded-full px-1.5 py-1.5
+                      border border-[#CFBB99]/70 shadow-inner">
+                      <button
                         onClick={() => decrementQuantity(product.id)}
-                        style={{ padding: '8px 12px', border: 'none', backgroundColor: '#fff', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', color: '#333' }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-[#4C3D19] font-bold
+                          hover:bg-[#CFBB99] transition-colors duration-150 text-lg"
                       >
                         −
                       </button>
-                      <span style={{ padding: '0 12px', fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>
+                      <span className="w-8 text-center text-sm font-bold text-[#354024]">
                         {cartItem.quantity}
                       </span>
-                      <button 
+                      <button
                         onClick={() => addToCart(product)}
-                        style={{ padding: '8px 12px', border: 'none', backgroundColor: '#fff', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', color: '#333' }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-[#4C3D19] font-bold
+                          hover:bg-[#CFBB99] transition-colors duration-150 text-lg"
                       >
                         +
                       </button>
                     </div>
-                  ) : 
-                  
-                  /* If it's NOT in the cart yet, show the standard Add button */
-                  (
-                    <button 
+                  ) : (
+                    <button
                       onClick={() => addToCart(product)}
-                      style={{ padding: '8px 15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                      className="px-5 py-2.5 bg-[#354024] text-[#E5D7C4] text-xs font-bold tracking-widest uppercase
+                        rounded-full hover:bg-[#4C3D19] active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg"
                     >
-                      Add to Cart
+                      Add
                     </button>
                   )}
-
                 </div>
               </div>
             </div>
