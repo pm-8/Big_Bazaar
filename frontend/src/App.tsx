@@ -21,11 +21,11 @@ function App() {
         <Route element={<Layout />}>
           
           {/* Admin Routes */}
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Storefront />} />
           <Route path="/products" element={<Products />} />
           
           {/* Customer Routes */}
-          <Route path="/store" element={<Storefront />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/product/:id" element={<ProductDetail />} />
