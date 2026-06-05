@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 1. Create the base instance
 export const api = axios.create({
-  baseURL: 'http://localhost:3001/api/v1', // Make sure this matches your backend port!
+  baseURL: 'https://big-bazaar-981x.onrender.com:3001/api/v1', // Make sure this matches your backend port!
   headers: {
     'Content-Type': 'application/json',
   },
