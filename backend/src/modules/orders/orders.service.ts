@@ -14,7 +14,7 @@ export class OrdersService {
     let totalAmount = 0;
     const validatedItems = [];
     for (const cartItem of data.items) {
-      const dbProduct = allProducts.find(p => p.id === cartItem.productId);
+      const dbProduct = allProducts.find((p : any) => p.id === cartItem.productId);
       if (!dbProduct) throw new Error(`Product ID ${cartItem.productId} not found.`);
       if (dbProduct.stock < cartItem.quantity) throw new Error(`Not enough stock for ${dbProduct.name}.`);
       const lineTotal = Number(dbProduct.price) * cartItem.quantity;
