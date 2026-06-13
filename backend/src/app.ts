@@ -10,9 +10,7 @@ const usersController = new UsersController();
 const app = express();
 
 app.use(cors({
-  origin: ['https://big-bazaar-beta.vercel.app'], 
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: '*' 
 }));
 
 app.use(express.json());
